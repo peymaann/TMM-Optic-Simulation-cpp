@@ -17,8 +17,8 @@ jobs:
       - name: Set up C++ compiler
         run: sudo apt-get install g++
 
-      - name: Compile C++ code
-        run: g++ -o my_program main.cpp
+      - name: Build with Makefile
+        run: make
 
       - name: Run the program
         run: ./bin/tmm
