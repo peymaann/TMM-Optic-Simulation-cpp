@@ -1,0 +1,24 @@
+# .github/workflows/cpp-build.yml
+name: C++ Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up C++ compiler
+        run: sudo apt-get install g++
+
+      - name: Compile C++ code
+        run: g++ -o my_program main.cpp
+
+      - name: Run the program
+        run: ./bin/tmm
