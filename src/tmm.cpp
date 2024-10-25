@@ -124,7 +124,7 @@ void tmm::print_solution()
 	string filename = "results/output.dat";
     std::ofstream outFile(filename);
     if (!outFile) {
-        std::cerr << "Error opening file: " << filename << std::endl;
+        throw std::runtime_error("Can't write the results.");
         return;
     }
 
