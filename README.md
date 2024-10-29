@@ -1,0 +1,1 @@
+This C++ project implements the Transfer Matrix Method (TMM) for optical simulations, enabling the analysis of light propagation through layered media.

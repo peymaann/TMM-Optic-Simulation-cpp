@@ -1,5 +1,6 @@
 #include "externalsource.h"
 #include "matrix2by2.h"
+#include "Utils_tmm.h"
 #include <iostream>
 using namespace std;
 
@@ -11,16 +12,18 @@ using namespace std;
 
 externalsource::externalsource()
 {
-	cout<<" externalsource defined\n";
+
 }
 
 
 externalsource::~externalsource()
 {
-	cout<<" externalsource removed\n";
+
 }
 void externalsource::solve()
 {
+	if (!chech_inputs())
+		return;
 	cout<<"start solving process\n";
 	matrix2by2 DD;
 	matrix2by2 MM;
@@ -34,8 +37,8 @@ void externalsource::solve()
     E_B.push_back(0);
 	for (size_t i = _mesh_size - 2; i < _mesh_size; --i)
     {	
-        DD = get_D(_n[i],-_k[i],_n[i+1],-_k[i+1],0,_lambda,0);
-        MM = get_M(_n[i],_k[i],_l[i],_lambda,0,0);
+        DD = Utils_tmm::get_D(_n[i],-_k[i],_n[i+1],-_k[i+1],0,_lambda,0);
+        MM = Utils_tmm::get_M(_n[i],_k[i],_l[i],_lambda,0,0);
         TT_load = DD * T;
         T = MM* TT_load;
         E_I = T * E_N  ;
@@ -48,7 +51,6 @@ void externalsource::solve()
         _E_Backward.push_back(E_B[_mesh_size-1-i]/E_F[_mesh_size-1]);
     }
 	
-	
 	double w = 2 * M_PI * c0 / _lambda;    
 	
 	for(size_t i=0; i < _mesh_size ; ++i)
@@ -57,10 +59,6 @@ void externalsource::solve()
 		_Intensity.push_back(0.5 * c0 * 1e-9 * e0 * _n[i] * _ESun2* pow(abs(Etot), 2));
 		_Generation.push_back(1 / (plank_const* w) * (4 * M_PI * _k[i] * 1e7/(_lambda)) * real(_Intensity.back())/ 1e4 );
     }
-	
-	
-	
-	
 }
 
 

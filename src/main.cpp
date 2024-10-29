@@ -12,17 +12,13 @@ using namespace std;
 int main(void)
 {	try {
 	
-		
 		size_t mesh = 500;
 		vector<double> n_vector(mesh);
 		vector<double> k_vector(mesh);
-		vector<double> l_vector(mesh);
-		
+		vector<double> l_vector(mesh);	
 		
 		tmm* model = new externalsource;
 		model->set_msh(mesh);
-		
-
 		
 		fill(n_vector.begin(), n_vector.end(), 2);
 		fill(k_vector.begin(), k_vector.end(), 0.001);
@@ -34,13 +30,16 @@ int main(void)
 		model->set_lambda(300);
 		model->set_esun(1.0);
 		
-		
 		model->solve();
 		model->print_solution();
 		
 		delete  model;
-	}catch (...) {
-        cout << "Caught an unknown exception." << endl;
+	}
+	catch (const exception& e) {
+        cout << "Caught exception: " << e.what() << std::endl;
+    }
+	catch (...) {
+        cout << "Caught an exception." << endl;
     }
 	
 	return 0;
