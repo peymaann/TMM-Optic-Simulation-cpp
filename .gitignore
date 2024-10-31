@@ -1,4 +1,6 @@
 key
-bin/tmm
 /results/
 /obj/
+figs/Generation_rate.png
+figs/TRA.png
+input.tmm

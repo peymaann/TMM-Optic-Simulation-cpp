@@ -13,22 +13,26 @@ class tmm
 		void set_k(vector<double> k);
 		void set_l(vector<double> l);
 		void set_msh(unsigned int mesh_size);
-		void set_lambda(unsigned int lambda);
-		void set_esun(double ESun);
+		void set_lambda(double lambda);
+		void set_irrediance(double ESun);
+		void set_outputfile(string filename);
+		vector<double> get_generation(void);
 		virtual void solve() = 0;
 		virtual void print_solution();
+		virtual vector<double> get_tra();
 	protected:
 		bool chech_inputs();
 		vector<double> _n;
 		vector<double> _k;
 		vector<double> _l;
-		unsigned int _lambda;
-		double _ESun2;
+		double _lambda;
+		double _irrediance;
 		vector<complex<double>> _E_Forward;
 		vector<complex<double>> _E_Backward;
 		vector<complex<double>> _Intensity;
 		vector<double> _Generation;		
 		unsigned int _mesh_size;
+		string _res_file = "output";
 
 	
 	private:

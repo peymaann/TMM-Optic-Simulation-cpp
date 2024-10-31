@@ -1,39 +1,38 @@
 #include<iostream>
-#include "matrix2by2.h"
-#include "tmm.h"
-#include "externalsource.h"
-#include <complex>
-#include <algorithm>
+#include <chrono>
+#include "simulation.h"
+#include "stack_layer.h"
 #include <utility>
-#include <stdexcept>
-
+#include<iostream>
+#include <sstream>
+#include <fstream>
 using namespace std;
 
-int main(void)
+
+
+int main()
 {	try {
 	
-		size_t mesh = 500;
-		vector<double> n_vector(mesh);
-		vector<double> k_vector(mesh);
-		vector<double> l_vector(mesh);	
+		auto start = std::chrono::high_resolution_clock::now();
+	
+		vector<stack_layer> Layers = {
+			{"Air1", 100, "materials/Air.nk"},
+			{"MAPI", 200, "materials/MAPI.nk"},
+			{"Ag", 30, "materials/Ag.nk"},
+			{"Air2", 100, "materials/Air.nk"}
+		};
+		pair<double, double> wavelength_lim;
+		wavelength_lim.first = 350;
+		wavelength_lim.second = 800;
 		
-		tmm* model = new externalsource;
-		model->set_msh(mesh);
 		
-		fill(n_vector.begin(), n_vector.end(), 2);
-		fill(k_vector.begin(), k_vector.end(), 0.001);
-		fill(l_vector.begin(), l_vector.end(), 100);
+		simulation dummy(Layers,wavelength_lim);
+		dummy.init();
+		dummy.run();
 		
-		model->set_n(move(n_vector));
-		model->set_k(move(k_vector));
-		model->set_l(move(l_vector));
-		model->set_lambda(300);
-		model->set_esun(1.0);
-		
-		model->solve();
-		model->print_solution();
-		
-		delete  model;
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = end - start;
+		std::cout << "Execution time: " << duration.count() << " seconds" << std::endl;
 	}
 	catch (const exception& e) {
         cout << "Caught exception: " << e.what() << std::endl;

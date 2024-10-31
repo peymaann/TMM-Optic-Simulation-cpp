@@ -5,7 +5,8 @@
 #include <sstream>
 #include <fstream>
 #include<cmath>
-
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ void tmm::set_l(vector<double> l)
 	_l = move(l);;
 }
 
-void tmm::set_lambda(unsigned int lambda)
+void tmm::set_lambda(double lambda)
 {
 	_lambda = lambda;
 }
@@ -43,9 +44,22 @@ void tmm::set_msh(unsigned int mesh_size)
 	_mesh_size = mesh_size;
 }
 
-void tmm::set_esun(double ESun)
+void tmm::set_irrediance(double irrediance)
 {
-	_ESun2 = ESun;
+	_irrediance = irrediance;
+}
+void tmm::set_outputfile(string filename)
+{
+	_res_file = filename;	
+}
+vector<double> tmm::get_generation(void)
+{
+	return _Generation;
+}
+vector<double> tmm::get_tra()
+{
+	vector<double> empty;
+	return empty;
 }
 bool tmm::chech_inputs()
 {
@@ -61,6 +75,7 @@ bool tmm::chech_inputs()
 	}
 	if (_l.size() != _mesh_size)
 	{
+		cout <<_l.size() <<" Vs " <<_mesh_size<<endl;
 		throw std::runtime_error("length vector dosn't match the mesh size");
 		return false;
 	}
@@ -69,9 +84,9 @@ bool tmm::chech_inputs()
 		throw std::runtime_error("wavelength should be in range of 300-1200");
 		return false;
 	}
-	if (_ESun2 <= 0)
+	if (_irrediance <= 0)
 	{
-		throw std::runtime_error("ESun2 should be postive values");
+		throw std::runtime_error("irrediance should be postive values");
 		return false;
 	}	
 	return true;
@@ -86,8 +101,11 @@ void tmm::print_solution()
     for (size_t i = 0; i < _E_Forward.size(); ++i) {
         oss << abs(_E_Forward[i]) << "," << abs(_E_Backward[i]) << "," << abs(_Intensity[i]) << "," << _Generation[i] << "\n"; 
     }
-	string filename = "results/output.dat";
-    std::ofstream outFile(filename);
+	ostringstream filename;
+	filename << fixed << std::setprecision(1) << "results/tmm_study_" << _lambda <<".dat";  // Set precision as needed
+			//std::string result = oss.str();
+	//string filename = "results/" + _res_file + ".dat";
+    ofstream outFile(filename.str());
     if (!outFile) {
         throw std::runtime_error("Can't write the results.");
         return;
@@ -96,7 +114,7 @@ void tmm::print_solution()
     outFile << oss.str();
     outFile.close();
 
-    std::cout << "Data written to " << filename << " successfully." << std::endl;
+    //std::cout << "written to " << filename  << std::endl;
 }
 
 
