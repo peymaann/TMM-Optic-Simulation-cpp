@@ -5,12 +5,33 @@
 #include <fstream>
 #include "externalsource.h"
 #include<iostream>
+#include <omp.h>
 
-simulation::simulation(const vector<stack_layer>& Layers, pair<double, double> wavelength_lim)
+#ifndef num_threads
+#define num_threads 8 
+#endif
+
+simulation::simulation(const vector<stack_layer>& Layers, const pair<double, double> wavelength_lim)
+:_Layers(Layers)
+{
+	cout << "# Simulation model\n";
+	_lower_lim = wavelength_lim.first;
+	_uper_lim = wavelength_lim.second;
+	if (_lower_lim > _uper_lim)
+	{
+		_lower_lim = wavelength_lim.second;
+		_uper_lim = wavelength_lim.first;
+	}
+	for (const auto& layer : Layers)
+	{
+		cout << layer.name << ", " <<layer.thickness << ", " << layer.data_file<<endl;
+	}
+
+}
+
+simulation::simulation(const vector<stack_layer>& Layers, const string irradinace_filename, const pair<double, double> wavelength_lim)
 :_Layers(Layers),
-_lower_lim(wavelength_lim.first),
-_uper_lim(wavelength_lim.second)
-
+_irradinace_filename(irradinace_filename)
 {
 	cout << "# Simulation model\n";
 	_lower_lim = wavelength_lim.first;
@@ -189,7 +210,8 @@ void simulation::plot_global_data(void)
 	oss << "#Printing the results\n";
 	oss << "#Wavelenth Transmission Reflection Absorption\n";
     for (size_t i = 0; i < _wavelengths.size(); ++i) {
-        oss <<_wavelengths[i] << "," << _TRA[i][0]<< "," << _TRA[i][1]<< "," << _TRA[i][2] << "\n"; 
+		auto it = _TRA.find(_wavelengths[i]);
+        oss <<_wavelengths[i] << "," << it->second[0]<< "," << it->second[1]<< "," << it->second[2] << "\n"; 
     }
 	filename = "results/TRA.dat";
     outFile.open(filename);
@@ -207,22 +229,25 @@ void simulation::plot_global_data(void)
 void simulation::run()
 {
 	_Generations.resize(_mesh);
-	auto wavelength = _wavelengths.begin();
-	auto irradiance = _irradiances.begin();
 	
 	vector<double> l_vector(_mesh);
 	fill(l_vector.begin(), l_vector.end(), 1);
 	
 	// main loop over wavelengths
-	for (;wavelength != _wavelengths.end() && irradiance != _irradiances.end(); ++wavelength , ++irradiance )
+	omp_set_num_threads(num_threads);
+	size_t wavelength_size = _wavelengths.size();
+	size_t completed = 0;
+	//std::cout<< "Progress: 0% completed" << std::flush;
+	#pragma omp parallel for
+	for ( size_t i = 0 ; i  < wavelength_size ; ++i)
 	{
-		
+		double wavelength = _wavelengths[i];
 		vector<double> n_vector(_mesh);
 		vector<double> k_vector(_mesh);
 		double x_initial = 0;
 		for (auto layer : _Layers)
 		{
-			auto it = _material_data.find({layer.name, *wavelength});
+			auto it = _material_data.find({layer.name, wavelength});
 			fill(n_vector.begin() + x_initial, n_vector.begin() + x_initial + layer.thickness, it->second.first );
 			fill(k_vector.begin() + x_initial, k_vector.begin() + x_initial + layer.thickness, it->second.second );
 			x_initial += layer.thickness;
@@ -236,19 +261,29 @@ void simulation::run()
 		model->set_k(move(k_vector));
 		model->set_l(l_vector);	
 		
-		model->set_lambda(*wavelength);
-		model->set_irrediance(*irradiance);
+		model->set_lambda(wavelength);
+		model->set_irrediance(_irradiances[i]);
 	
 		
 		model->solve();
 		model->print_solution();
 		vector<double> generation(_mesh);
 		generation = model->get_generation();
-		transform(_Generations.begin(), _Generations.end(), generation.begin(), _Generations.begin(), std::plus<double>());
+		auto tra = model->get_tra();
 		
-		vector<double> tra = model->get_tra();
-		_TRA.push_back(tra);
-		delete  model;						
+		#pragma omp critical
+		{
+			transform(_Generations.begin(), _Generations.end(), generation.begin(), _Generations.begin(), std::plus<double>());
+			_TRA[wavelength] = tra;
+			completed++; 
+			std::cout << "\rProgress: " << (int)(completed * 100 )/wavelength_size << " % completed" << std::flush;
+		}
+		
+		delete  model;		
 	}
+	std::cout<<std::endl;
+	std::cout<<"---------------------------------------------------------------"<<std::endl;
+	std::cout<<std::endl;
+
 	this->plot_global_data();
 }

@@ -36,9 +36,5 @@ class tmm
 
 	
 	private:
-	
-	
-
-	 
 };
 #endif

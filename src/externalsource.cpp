@@ -32,7 +32,7 @@ void externalsource::solve()
 {
 	if (!chech_inputs())
 		return;
-	cout<<"start solving tmm for "<< _lambda <<"nm\n";
+	//cout<<"start solving tmm for "<< _lambda <<"nm\n";
 	matrix2by2 DD;
 	matrix2by2 MM;
 	matrix2by2 TT_load;

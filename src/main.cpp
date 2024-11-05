@@ -2,33 +2,27 @@
 #include <chrono>
 #include "simulation.h"
 #include "stack_layer.h"
-#include <utility>
-#include<iostream>
-#include <sstream>
-#include <fstream>
+#include <memory>
 using namespace std;
-
-
-
 int main()
 {	try {
 	
 		auto start = std::chrono::high_resolution_clock::now();
-	
+		
 		vector<stack_layer> Layers = {
-			{"Air1", 100, "materials/Air.nk"},
-			{"MAPI", 200, "materials/MAPI.nk"},
+			{"Air1", 1000, "materials/Air.nk"},
+			{"MAPI", 500, "materials/MAPI.nk"},
 			{"Ag", 30, "materials/Ag.nk"},
-			{"Air2", 100, "materials/Air.nk"}
+			{"Air2", 1000, "materials/Air.nk"}
 		};
-		pair<double, double> wavelength_lim;
-		wavelength_lim.first = 350;
-		wavelength_lim.second = 800;
+		string irradinace_filename = "materials/Sun1p5am.dat";
 		
+		pair<double, double> wavelength_lim(350,950);
 		
-		simulation dummy(Layers,wavelength_lim);
-		dummy.init();
-		dummy.run();
+		unique_ptr<simulation> dummy = make_unique<simulation>(Layers,irradinace_filename, wavelength_lim);
+		
+		dummy->init();
+		dummy->run();
 		
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> duration = end - start;
