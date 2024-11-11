@@ -7,7 +7,7 @@
 #include<cmath>
 #include <sstream>
 #include <iomanip>
-
+//#include <filesystem>
 using namespace std;
 
 tmm::tmm() 
@@ -95,6 +95,11 @@ bool tmm::chech_inputs()
 void tmm::print_solution()
 {
 
+	//std::string result_path = "results";
+	//if (!std::filesystem::exists(result_path))
+    //    if (std::filesystem::create_directory(result_path))
+			;
+	
 	std::ostringstream oss;
 	oss << "#Printing the results\n";
 	oss << "#E_F, E_B, I, G\n";

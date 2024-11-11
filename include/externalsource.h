@@ -13,6 +13,7 @@ class externalsource: public tmm
 		~externalsource();
 		vector<double> get_tra() override;
 		void solve() override;
+		int check_highly_absobing();
 
 	private:
 		double _T;

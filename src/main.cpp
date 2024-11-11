@@ -11,13 +11,13 @@ int main()
 		
 		vector<stack_layer> Layers = {
 			{"Air1", 1000, "materials/Air.nk"},
-			{"MAPI", 500, "materials/MAPI.nk"},
-			{"Ag", 30, "materials/Ag.nk"},
+			{"MAPI", 15000, "materials/MAPI.nk"},
+			{"Ag", 100, "materials/Ag.nk"},
 			{"Air2", 1000, "materials/Air.nk"}
 		};
 		string irradinace_filename = "materials/Sun1p5am.dat";
 		
-		pair<double, double> wavelength_lim(350,950);
+		pair<int, int> wavelength_lim(300,950);
 		
 		unique_ptr<simulation> dummy = make_unique<simulation>(Layers,irradinace_filename, wavelength_lim);
 		

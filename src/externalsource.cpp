@@ -32,7 +32,6 @@ void externalsource::solve()
 {
 	if (!chech_inputs())
 		return;
-	//cout<<"start solving tmm for "<< _lambda <<"nm\n";
 	matrix2by2 DD;
 	matrix2by2 MM;
 	matrix2by2 TT_load;
@@ -41,9 +40,16 @@ void externalsource::solve()
 	matrix2by2 E_I;
 	vector<complex<double>> E_F;
 	vector<complex<double>> E_B;	
+	size_t N0 = check_highly_absobing();
+	if (N0 != 0)
+		for (size_t i = 0 ; i< N0; ++i)
+		{
+			E_F.push_back(0);
+			E_B.push_back(0);
+		}
 	E_F.push_back(1);
     E_B.push_back(0);
-	for (size_t i = _mesh_size - 2; i < _mesh_size; --i)
+	for (size_t i = _mesh_size - N0 - 2; i < _mesh_size; --i)
     {	
         DD = Utils_tmm::get_D(_n[i],-_k[i],_n[i+1],-_k[i+1],0,_lambda,0);
         MM = Utils_tmm::get_M(_n[i],_k[i],_l[i],_lambda,0,0);
@@ -75,6 +81,27 @@ void externalsource::solve()
 	_T = real((RI_last_elem / RI_first_elem) * pow(abs(1.0/T.get(0)),2));
 	_A = (1-_T-_R);
 	
+}
+int externalsource::check_highly_absobing()
+{
+	size_t N0 = 0;
+    matrix2by2 DD;
+    matrix2by2 MM;
+    matrix2by2 TT_load;
+    matrix2by2 TT(1,0,0,1);
+    for (size_t i = 0 ; i <= _mesh_size-2 ; ++i)
+    {
+		DD = Utils_tmm::get_D(_n[i],_k[i],_n[i+1],_k[i+1],0,_lambda,0);
+		MM = Utils_tmm::get_M(_n[i],_k[i],_l[i],_lambda,0,0);
+		TT_load = MM * DD;
+		TT = TT * TT_load ;
+		if (real(abs(TT.get(0))) > 1e120)
+		{
+			N0 = _mesh_size - i;
+			return N0; //number of elements from back sild that will be iqnored
+		}
+    }
+	return 0;
 }
 
 

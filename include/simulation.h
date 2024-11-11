@@ -32,8 +32,8 @@ class simulation
 		vector<double> _Generations;	
 		map<double, vector<double>> _TRA;
 		
-		double _lower_lim;
-		double _uper_lim;
+		int _lower_lim;
+		int _uper_lim;
 		map<pair<string, double>, pair<double, double>> _material_data;
 
 };

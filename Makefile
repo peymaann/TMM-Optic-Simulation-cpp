@@ -1,6 +1,6 @@
 CXX = g++
 
-CXXFLAGS = -std=c++17 -fopenmp -Wall -Wextra -O0 -Iinclude -MMD
+CXXFLAGS = -std=c++17 -lstdc++fs -fopenmp -Wall -Wextra -O0 -Iinclude -MMD
 
 TARGET = bin/tmm
 

@@ -8,7 +8,7 @@
 #include <omp.h>
 
 #ifndef num_threads
-#define num_threads 8 
+#define num_threads 8
 #endif
 
 simulation::simulation(const vector<stack_layer>& Layers, const pair<double, double> wavelength_lim)
@@ -95,7 +95,7 @@ void simulation::load_refractiveIndex(void)
 				
 
 		}
-		for (size_t it = _lower_lim ; it<=_uper_lim ; ++it)
+		for (int it = _lower_lim ; it<=_uper_lim ; ++it)
 		{
 			double n,k;
 			n = this->interpolate(it,wl_data,n_data);
@@ -173,7 +173,7 @@ void simulation::read_irradiance_file(void)
 			radiation.push_back(irradiance);
         }
     }
-	for (size_t it = _lower_lim ; it<=_uper_lim ; ++it)
+	for (int it = _lower_lim ; it<=_uper_lim ; ++it)
 	{
 		irradiance = this->interpolate(it,wl,radiation);
 		_wavelengths.push_back(it);
