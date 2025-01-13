@@ -19,6 +19,3 @@ jobs:
 
       - name: Build with Makefile
         run: make
-
-      - name: Run the program
-        run: ./bin/tmm
